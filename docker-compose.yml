@@ -1,0 +1,18 @@
+version: '3.9'
+
+services:
+  api:
+    build: ./backend
+    ports:
+      - "5000:5000"
+    environment:
+      - MONGO_URI=mongodb+srv://vivekTiwari:test123@cluster0.rkjwciy.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+      - JWT_SECRET=5ef55b0d65ee3c476c601a0189ced41e0cf10ebc28285777de937c7ee5d33397abbbaafca177949be6efb84134a6e027b0dbd83ef33fc114ad93dfccd27f26c3
+    depends_on:
+      - redis
+
+  redis:
+    image: redis
+    container_name: redis
+    ports:
+      - "6379:6379"
