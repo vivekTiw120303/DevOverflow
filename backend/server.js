@@ -12,7 +12,7 @@ const io = socketio(server, {
   },
 });
 
-io.on('cnnection', (socket) => {
+io.on('connection', (socket) => {
   console.log('User connected');
 
   socket.on('newAnswer', (questionId) => {
@@ -28,6 +28,6 @@ io.on('cnnection', (socket) => {
 app.set('io', io); // Set io instance to app
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 })
