@@ -2,8 +2,15 @@ const app = require('./app');
 const connectDB = require('./config/db');
 const socketio = require('socket.io');
 const http = require('http');
+const redisClient = require('./utils/redisClient');
+require('./workers/notificationWorker');
 
-connectDB(); // Connect to MongoDB
+connectDB();
+
+// CONNECT TO REDIS
+(async () => {
+    await redisClient.connect();
+})();
 
 const server = http.createServer(app);
 const io = socketio(server, {
@@ -25,9 +32,9 @@ io.on('connection', (socket) => {
 
 });
 
-app.set('io', io); // Set io instance to app
+app.set('io', io);
 
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
-})
+});

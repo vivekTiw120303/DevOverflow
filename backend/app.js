@@ -2,50 +2,45 @@ const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
 const helmet = require('helmet');
-// const rateLimit = require('express-rate-limit');
-// const RedisStore = require('rate-limit-redis').default;
+require('dotenv').config();
 
 const userRoutes = require('./routes/users');
 const authRoutes = require('./routes/auth');
 const questionRoutes = require('./routes/questions');
-require('dotenv').config();
+
+// Import Error Handlers
+const globalErrorHandler = require('./middlewares/errorHandler');
+const AppError = require('./utils/AppError');
 
 const app = express();
-// const { createClient } = require('redis'); 
 
-app.use(cors());
+// Security and Utility Middlewares
+app.use(cors({
+    origin: ['http://localhost:3000', 'http://127.0.0.1:3000'], // Allow your Next.js frontend
+    credentials: true // Allow cookies/authorization headers if needed
+}));
 app.use(helmet());
 app.use(morgan('dev'));
 app.use(express.json());
 
-// Connect redis
-// const redisClient = createClient({
-//     socket: {
-//         host: process.env.REDIS_HOST, 
-//         port: process.env.REDIS_PORT 
-//     }
-// });
-
-// redisClient.connect().catch(console.error);
-
-// const limiter = rateLimit({
-//     windowMs: 15 * 60 * 1000, // 15 minutes
-//     max: 100, // Limit each IP to 100 requests per windowMs
-//     standardHeaders: true,
-//     legacyHeaders: false,
-//     store: new RedisStore({
-//         sendCommand: (...args) => redisClient.sendCommand(args),
-//     }),
-//     message: 'Too many requests, please try again later.',
-// });
-// app.use(limiter);
-
+// Main Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/questions', questionRoutes);
 app.use('/api/users', userRoutes);
 
+// Root Route
 app.get('/', (req,res) => {
-    res.send('Welcome to the API!');
+    res.send('Welcome to the DevOverflow API V2!');
 });
+
+// CATCH UNHANDLED ROUTES (404)
+// If a request bypasses all the routes above, it hits this.
+app.use((req, res, next) => {
+    next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
+});
+
+// GLOBAL ERROR HANDLER
+// This must be the absolute last middleware registered
+app.use(globalErrorHandler);
 
 module.exports = app;

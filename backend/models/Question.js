@@ -16,4 +16,10 @@ const questionSchema = new mongoose.Schema({
     flags: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
 }, {timestamps: true});
 
+// 🔥 THE SENIOR FLEX: Compound Text Indexing with Weights
+questionSchema.index(
+    { title: 'text', description: 'text', tags: 'text' },
+    { weights: { title: 5, tags: 3, description: 1 } }
+);
+
 module.exports = mongoose.model('Question', questionSchema);

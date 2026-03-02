@@ -6,7 +6,7 @@ const router = express.Router();
 
 router.get('/me', async (req,res) => {
     try{
-        const user = User.findById(req.user).select('-password');
+        const user = await User.findById(req.user).select('-password');
         if(!user) return res.status(404).json({msg: 'User not found'});
 
         const question = await Question.find({user: req.user}).sort({createdAt:-1});
